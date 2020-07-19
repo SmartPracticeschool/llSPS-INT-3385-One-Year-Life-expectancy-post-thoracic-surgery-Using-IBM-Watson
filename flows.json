@@ -1,0 +1,167 @@
+[
+    {
+        "id": "26458406.7e993c",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "693a3416.365d7c",
+        "type": "function",
+        "z": "26458406.7e993c",
+        "name": "PreToken",
+        "func": "global.set(\"dg\",msg.payload.dg)\nglobal.set(\"fvc\",msg.payload.fvc)\nglobal.set(\"fev\",msg.payload.fev)\nglobal.set(\"pf\",msg.payload.pf)\nglobal.set(\"pn\",msg.payload.pn)\nglobal.set(\"hm\",msg.payload.hm)\nglobal.set(\"dy\",msg.payload.dy)\nglobal.set(\"cu\",msg.payload.cu)\nglobal.set(\"wk\",msg.payload.wk)\nglobal.set(\"ts\",msg.payload.ts)\nglobal.set(\"dm\",msg.payload.dm)\nglobal.set(\"mi\",msg.payload.mi)\nglobal.set(\"pd\",msg.payload.pd)\nglobal.set(\"sm\",msg.payload.sm)\nglobal.set(\"as\",msg.payload.as)\nglobal.set(\"age\",msg.payload.age)\nvar apikey=\"yUc6oxsPDsMpnjDYFiXc-N5oPV-RVe-gFp8J3ISrk_I6\";\nmsg.headers={\"content-type\":\"application/x-www-form-urlencoded\"}\nmsg.payload={\"grant_type\":\"urn:ibm:params:oauth:grant-type:apikey\",\"apikey\":apikey}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 280,
+        "y": 380,
+        "wires": [
+            [
+                "2acd733d.b738dc"
+            ]
+        ]
+    },
+    {
+        "id": "a63dde17.caa",
+        "type": "function",
+        "z": "26458406.7e993c",
+        "name": "Pre Prediction",
+        "func": "var dg = global.get('dg')\nvar fvc = global.get('fvc')\nvar fev = global.get('fev')\nvar pf = global.get('pf')\nvar pn = global.get('pn')\nvar hm = global.get('hm')\nvar dy = global.get('dy')\nvar cu = global.get('cu')\nvar wk = global.get('wk')\nvar ts = global.get('ts')\nvar dm = global.get('dm')\nvar mi = global.get('mi')\nvar pd = global.get('pd')\nvar sm = global.get('sm')\nvar as = global.get('as')\nvar age = global.get('age')\nvar token=msg.payload.access_token\nvar instance_id=\"8d6602ab-cebc-4729-9692-b7e9b15edf9b\"\nmsg.headers={'Content-Type': 'application/json',\"Authorization\":\"Bearer \"+token,\"ML-Instance-ID\":instance_id}\nmsg.payload={\"input_data\": [{\"fields\": [\"Diagnosis\",\"FVC\",\"FEV1\",\"Performance\",\"Pain\",\"Haemoptysis\",\"Dyspnoea\",\"Cough\",\"Weakness\",\"Tumor_Size\",\"Diabetes_Mellitus\",\"MI_6mo\",\"PAD\",\"Smoking\",\"Asthma\",\"Age\"], \"values\": [[dg,fvc,fev,pf,pn,hm,dy,cu,wk,ts,dm,mi,pd,sm,as,age]]}]}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 660,
+        "y": 340,
+        "wires": [
+            [
+                "91021a9c.52bb58"
+            ]
+        ]
+    },
+    {
+        "id": "91021a9c.52bb58",
+        "type": "http request",
+        "z": "26458406.7e993c",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://eu-gb.ml.cloud.ibm.com/v4/deployments/5a0762d0-e13d-4ed9-8db3-967ff63f6186/predictions",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 730,
+        "y": 260,
+        "wires": [
+            [
+                "22154c53.38ca44",
+                "e87a579e.e62638"
+            ]
+        ]
+    },
+    {
+        "id": "2acd733d.b738dc",
+        "type": "http request",
+        "z": "26458406.7e993c",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://iam.cloud.ibm.com/identity/token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 440,
+        "y": 300,
+        "wires": [
+            [
+                "a63dde17.caa"
+            ]
+        ]
+    },
+    {
+        "id": "21f55535.52cd9a",
+        "type": "debug",
+        "z": "26458406.7e993c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 860,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "22154c53.38ca44",
+        "type": "function",
+        "z": "26458406.7e993c",
+        "name": "Function",
+        "func": "msg.payload=msg.payload.predictions[0].values[0][0]\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 660,
+        "y": 160,
+        "wires": [
+            [
+                "21f55535.52cd9a"
+            ]
+        ]
+    },
+    {
+        "id": "508580e.cb78c8",
+        "type": "inject",
+        "z": "26458406.7e993c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 60,
+        "y": 320,
+        "wires": [
+            [
+                "693a3416.365d7c"
+            ]
+        ]
+    },
+    {
+        "id": "e87a579e.e62638",
+        "type": "debug",
+        "z": "26458406.7e993c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 340,
+        "wires": []
+    }
+]
